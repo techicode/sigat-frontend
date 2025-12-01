@@ -136,16 +136,16 @@ const AssetTypeBadge = ({ type }) => {
 
 const AssetStatusBadge = ({ status }) => {
   const colors = {
-    BODEGA: 'bg-gray-500/20 text-gray-400',
+    EN_BODEGA: 'bg-gray-500/20 text-gray-400',
     ASIGNADO: 'bg-green-500/20 text-green-400',
-    REPARACION: 'bg-yellow-500/20 text-yellow-400',
+    EN_REPARACION: 'bg-yellow-500/20 text-yellow-400',
     DE_BAJA: 'bg-red-500/20 text-red-400',
   };
 
   const labels = {
-    BODEGA: 'En Bodega',
+    EN_BODEGA: 'En Bodega',
     ASIGNADO: 'Asignado',
-    REPARACION: 'En Reparación',
+    EN_REPARACION: 'En Reparación',
     DE_BAJA: 'De Baja',
   };
 

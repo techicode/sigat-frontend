@@ -38,9 +38,9 @@ const ASSET_TYPE_ICONS = {
 
 // Asset status badge colors
 const STATUS_COLORS = {
-  BODEGA: 'bg-gray-500 text-white',
+  EN_BODEGA: 'bg-gray-500 text-white',
   ASIGNADO: 'bg-green-500 text-white',
-  REPARACION: 'bg-yellow-500 text-black',
+  EN_REPARACION: 'bg-yellow-500 text-black',
   DE_BAJA: 'bg-red-500 text-white',
 };
 
@@ -48,9 +48,9 @@ const STATUS_COLORS = {
 const StatusBadge = ({ status }) => {
   const colorClass = STATUS_COLORS[status] || 'bg-gray-600 text-white';
   const displayStatus = {
-    BODEGA: 'En Bodega',
+    EN_BODEGA: 'En Bodega',
     ASIGNADO: 'Asignado',
-    REPARACION: 'En Reparación',
+    EN_REPARACION: 'En Reparación',
     DE_BAJA: 'De Baja',
   }[status] || status;
 
@@ -226,7 +226,7 @@ const CreateAssetModal = ({ onClose, onSuccess, departments, employees }) => {
     asset_type: 'MONITOR',
     brand: '',
     model: '',
-    status: 'BODEGA',  // Valor correcto del backend
+    status: 'EN_BODEGA',  // Valor correcto del backend
     department_id: '',
     employee_id: '',
   });
@@ -384,9 +384,9 @@ const CreateAssetModal = ({ onClose, onSuccess, departments, employees }) => {
                   required
                   className="w-full px-3 py-2 bg-gray-700 text-white border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
-                  <option value="BODEGA">En Bodega</option>
+                  <option value="EN_BODEGA">En Bodega</option>
                   <option value="ASIGNADO">Asignado</option>
-                  <option value="REPARACION">En Reparación</option>
+                  <option value="EN_REPARACION">En Reparación</option>
                   <option value="DE_BAJA">De Baja</option>
                 </select>
               </div>
@@ -846,7 +846,7 @@ const AssetDetailModal = ({ asset, onClose, onUpdate, onAssetUpdated, isAdmin, d
     inventory_code: asset?.inventory_code || '',
     serial_number: asset?.serial_number || '',
     asset_type: asset?.asset_type || 'NOTEBOOK',
-    status: asset?.status || 'BODEGA',
+    status: asset?.status || 'EN_BODEGA',
     brand: asset?.brand || '',
     model: asset?.model || '',
     purchase_date: asset?.purchase_date || '',
@@ -1080,9 +1080,9 @@ const AssetDetailModal = ({ asset, onClose, onUpdate, onAssetUpdated, isAdmin, d
                     onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value }))}
                     className="w-full px-3 py-2 bg-gray-700 text-white border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500"
                   >
-                    <option value="BODEGA">En Bodega</option>
+                    <option value="EN_BODEGA">En Bodega</option>
                     <option value="ASIGNADO">Asignado</option>
-                    <option value="REPARACION">En Reparación</option>
+                    <option value="EN_REPARACION">En Reparación</option>
                     <option value="DE_BAJA">De Baja</option>
                   </select>
                 ) : (
@@ -1575,9 +1575,9 @@ const Assets = () => {
             value={filterStatus}
             onChange={setFilterStatus}
             options={[
-              { value: 'BODEGA', label: 'En Bodega' },
+              { value: 'EN_BODEGA', label: 'En Bodega' },
               { value: 'ASIGNADO', label: 'Asignado' },
-              { value: 'REPARACION', label: 'En Reparación' },
+              { value: 'EN_REPARACION', label: 'En Reparación' },
               { value: 'DE_BAJA', label: 'De Baja' },
             ]}
           />

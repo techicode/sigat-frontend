@@ -14,21 +14,25 @@ export const AuthProvider = ({ children }) => {
     const token = localStorage.getItem('accessToken');
     const username = localStorage.getItem('username');
     const role = localStorage.getItem('role');
+    const firstName = localStorage.getItem('first_name');
+    const lastName = localStorage.getItem('last_name');
 
     if (token && username) {
-      setUser({ username, role });
+      setUser({ username, role, first_name: firstName, last_name: lastName });
       setIsAuthenticated(true);
     }
     setLoading(false);
   }, []);
 
-  const login = (accessToken, refreshToken, username, role) => {
+  const login = (accessToken, refreshToken, username, role, firstName, lastName) => {
     localStorage.setItem('accessToken', accessToken);
     localStorage.setItem('refreshToken', refreshToken);
     localStorage.setItem('username', username);
     localStorage.setItem('role', role);
+    localStorage.setItem('first_name', firstName || '');
+    localStorage.setItem('last_name', lastName || '');
 
-    setUser({ username, role });
+    setUser({ username, role, first_name: firstName, last_name: lastName });
     setIsAuthenticated(true);
     navigate('/dashboard');
   };
@@ -38,6 +42,8 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('username');
     localStorage.removeItem('role');
+    localStorage.removeItem('first_name');
+    localStorage.removeItem('last_name');
 
     setUser(null);
     setIsAuthenticated(false);

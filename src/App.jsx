@@ -8,8 +8,14 @@ import Assets from './components/Assets';
 import Software from './components/Software';
 import Licenses from './components/Licenses';
 import Warnings from './components/Warnings';
+import HardwareObsolescence from './components/HardwareObsolescence';
+import Reports from './components/Reports';
 import Users from './components/Users';
 import Departments from './components/Departments';
+import Staff from './components/Staff';
+import AuditLog from './components/AuditLog';
+import CheckIns from './components/CheckIns';
+import CheckInForm from './components/CheckInForm';
 import './App.css';
 
 function App() {
@@ -19,6 +25,7 @@ function App() {
         <Routes>
           {/* Public routes */}
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/checkin/:token" element={<CheckInForm />} />
 
           {/* Protected routes */}
           <Route
@@ -35,8 +42,13 @@ function App() {
             <Route path="software" element={<Software />} />
             <Route path="licenses" element={<Licenses />} />
             <Route path="warnings" element={<Warnings />} />
+            <Route path="hardware-obsolescence" element={<HardwareObsolescence />} />
+            <Route path="reports" element={<Reports />} />
+            <Route path="checkins" element={<CheckIns />} />
             <Route path="users" element={<Users />} />
             <Route path="departments" element={<Departments />} />
+            <Route path="staff" element={<Staff />} />
+            <Route path="audit-logs" element={<AuditLog />} />
           </Route>
 
           {/* Fallback route */}

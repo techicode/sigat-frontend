@@ -17,8 +17,9 @@ const Header = () => {
       '/software': 'Catálogo de Software',
       '/licenses': 'Gestión de Licencias',
       '/warnings': 'Advertencias de Cumplimiento',
-      '/users': 'Usuarios y Empleados',
-      '/departments': 'Departamentos',
+      '/users': 'Gestión de Empleados',
+      '/staff': 'Personal del Área IT',
+      '/departments': 'Gestión de Departamentos',
     };
     return titles[path] || 'SIGAT';
   };
@@ -30,6 +31,22 @@ const Header = () => {
   const handleLogout = () => {
     setDropdownOpen(false);
     logout();
+  };
+
+  // Get first name from user data
+  const getFirstName = () => {
+    // Prefer first_name from user profile if available
+    if (user?.first_name) {
+      return user.first_name;
+    }
+
+    // Fallback: extract from username (e.g., "luis.guillermo" -> "Luis")
+    if (user?.username) {
+      const namePart = user.username.split('.')[0];
+      return namePart.charAt(0).toUpperCase() + namePart.slice(1);
+    }
+
+    return 'Usuario';
   };
 
   return (
@@ -46,7 +63,7 @@ const Header = () => {
           >
             <User className="w-6 h-6" />
             <span className="hidden md:inline">
-              Bienvenido, {user?.username || 'Usuario'}
+              Bienvenido, {getFirstName()}
             </span>
             <ChevronDown className="w-4 h-4" />
           </button>

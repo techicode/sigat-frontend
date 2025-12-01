@@ -4,6 +4,9 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import styles from './LoginPage.module.css';
 
+// Backend API URL desde variables de entorno
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+
 function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -11,6 +14,14 @@ function LoginPage() {
   const [loading, setLoading] = useState(false);
   const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+
+  // Set page title
+  useEffect(() => {
+    document.title = 'Iniciar Sesión - SIGAT';
+    return () => {
+      document.title = 'SIGAT';
+    };
+  }, []);
 
   // Redirect to dashboard if already authenticated
   useEffect(() => {
@@ -25,16 +36,16 @@ function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:8000/api/token/', {
+      const response = await axios.post(`${API_BASE_URL}/token/`, {
         username,
         password,
       });
 
       // Extract token and user info from response
-      const { access, refresh, username: user, role } = response.data;
+      const { access, refresh, username: user, role, first_name, last_name } = response.data;
 
       // Call login function from AuthContext
-      login(access, refresh, user, role);
+      login(access, refresh, user, role, first_name, last_name);
     } catch (err) {
       // Error handling
       if (err.response?.status === 401) {

@@ -1,10 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Monitor, Users, AlertTriangle, Calendar, Loader2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../axiosConfig';
+import { WarningDetailModal } from './Warnings';
 
 // KPI Card Component
-const KpiCard = ({ title, value, icon: Icon, valueColor = 'text-white', loading = false }) => (
-  <div className="bg-gray-800 p-6 rounded-lg shadow-lg flex items-center justify-between">
+const KpiCard = ({ title, value, icon: Icon, valueColor = 'text-white', loading = false, onClick }) => (
+  <div
+    onClick={onClick}
+    className={`bg-gray-800 p-6 rounded-lg shadow-lg flex items-center justify-between ${
+      onClick ? 'cursor-pointer hover:bg-gray-700 transition-colors' : ''
+    }`}
+  >
     <div>
       <p className="text-sm font-medium text-gray-400 uppercase">{title}</p>
       {loading ? (
@@ -67,11 +74,22 @@ const getRelativeTime = (dateString) => {
 };
 
 const Dashboard = () => {
+  const navigate = useNavigate();
+
+  // Set page title
+  useEffect(() => {
+    document.title = 'Dashboard - SIGAT';
+    return () => {
+      document.title = 'SIGAT';
+    };
+  }, []);
+
   // State management
   const [kpiData, setKpiData] = useState([]);
   const [warningsData, setWarningsData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedWarning, setSelectedWarning] = useState(null);
 
   // Fetch dashboard stats from API
   useEffect(() => {
@@ -93,42 +111,42 @@ const Dashboard = () => {
             title: 'Activos Totales',
             value: formatNumber(stats.total_assets),
             icon: Monitor,
+            onClick: () => navigate('/assets'),
           },
           {
             title: 'Usuarios Asignados',
             value: formatNumber(stats.assigned_employees),
             icon: Users,
+            onClick: () => navigate('/users'),
           },
           {
             title: 'Advertencias Activas',
             value: formatNumber(stats.active_warnings),
             icon: AlertTriangle,
             color: 'text-orange-400',
+            onClick: () => navigate('/warnings?active=true'),
           },
           {
             title: 'Licencias por Vencer',
             value: formatNumber(stats.expiring_licenses),
             icon: Calendar,
             color: 'text-red-500',
+            // TODO: Add licenses page when it exists
+            // onClick: () => navigate('/licenses'),
           },
         ]);
 
-        // Fetch latest compliance warnings from API
-        const warningsResponse = await axiosInstance.get('/compliance-warnings/?limit=5');
+        // Fetch latest ACTIVE compliance warnings from API (only NUEVA status)
+        const warningsResponse = await axiosInstance.get('/compliance-warnings/?limit=5&status=NUEVA');
 
         // Transform backend data to frontend format
         const transformedWarnings = warningsResponse.data.results.map((warning) => {
-          // Map backend status values to frontend display values
-          let displayStatus = warning.status;
-          if (warning.status === 'EN_REVISION') displayStatus = 'EN REVISIÓN';
-          if (warning.status === 'FALSO_POSITIVO') displayStatus = 'FALSO POSITIVO';
-
           return {
             id: warning.id,
             asset: warning.asset.inventory_code,
             category: warning.category,
             date: getRelativeTime(warning.detection_date),
-            status: displayStatus,
+            status: 'NUEVA',
           };
         });
 
@@ -143,6 +161,46 @@ const Dashboard = () => {
 
     fetchDashboardStats();
   }, []);
+
+  // Handle warning click - fetch full warning details
+  const handleWarningClick = async (warningId) => {
+    try {
+      const response = await axiosInstance.get(`/compliance-warnings/${warningId}/`);
+      setSelectedWarning(response.data);
+    } catch (err) {
+      console.error('Error fetching warning details:', err);
+    }
+  };
+
+  // Handle modal close
+  const handleCloseModal = () => {
+    setSelectedWarning(null);
+  };
+
+  // Handle warning update - refresh the warnings list (only NUEVA)
+  const handleWarningUpdate = async () => {
+    try {
+      const warningsResponse = await axiosInstance.get('/compliance-warnings/?limit=5&status=NUEVA');
+      const transformedWarnings = warningsResponse.data.results.map((warning) => {
+        return {
+          id: warning.id,
+          asset: warning.asset.inventory_code,
+          category: warning.category,
+          date: getRelativeTime(warning.detection_date),
+          status: 'NUEVA',
+        };
+      });
+      setWarningsData(transformedWarnings);
+
+      // Also refresh the selected warning to show updated data
+      if (selectedWarning) {
+        const response = await axiosInstance.get(`/compliance-warnings/${selectedWarning.id}/`);
+        setSelectedWarning(response.data);
+      }
+    } catch (err) {
+      console.error('Error refreshing warnings:', err);
+    }
+  };
 
   // Error state
   if (error) {
@@ -183,48 +241,73 @@ const Dashboard = () => {
               value={item.value}
               icon={item.icon}
               valueColor={item.color}
+              onClick={item.onClick}
             />
           ))
         )}
       </div>
 
-      {/* Recent Warnings Section */}
+      {/* Active Warnings Section */}
       <div className="bg-gray-800 rounded-lg shadow-lg p-6">
-        <h3 className="text-xl font-semibold text-white mb-6">
-          Últimas Advertencias de Cumplimiento
-        </h3>
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-xl font-semibold text-white">
+            Advertencias Activas
+          </h3>
+          <span className="px-3 py-1 bg-orange-500/20 text-orange-400 rounded-full text-sm font-medium">
+            Sin atender
+          </span>
+        </div>
 
         {/* Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-max text-left text-gray-300">
-            <thead className="border-b border-gray-700">
-              <tr className="text-gray-400 uppercase text-sm">
-                <th className="py-4 px-4">Activo</th>
-                <th className="py-4 px-4">Categoría</th>
-                <th className="py-4 px-4">Fecha de Detección</th>
-                <th className="py-4 px-4">Estado</th>
-              </tr>
-            </thead>
-            <tbody>
-              {warningsData.map((warning) => (
-                <tr
-                  key={warning.id}
-                  className="border-b border-gray-700 hover:bg-gray-700/50 transition-colors"
-                >
-                  <td className="py-4 px-4 font-medium text-white">
-                    {warning.asset}
-                  </td>
-                  <td className="py-4 px-4">{warning.category}</td>
-                  <td className="py-4 px-4">{warning.date}</td>
-                  <td className="py-4 px-4">
-                    <StatusBadge status={warning.status} />
-                  </td>
+        {warningsData.length === 0 ? (
+          <div className="text-center py-12">
+            <AlertTriangle className="w-12 h-12 text-gray-600 mx-auto mb-4" />
+            <p className="text-gray-400 text-lg">No hay advertencias activas</p>
+            <p className="text-gray-500 text-sm mt-2">¡Todo está en orden!</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-max text-left text-gray-300">
+              <thead className="border-b border-gray-700">
+                <tr className="text-gray-400 uppercase text-sm">
+                  <th className="py-4 px-4">Activo</th>
+                  <th className="py-4 px-4">Categoría</th>
+                  <th className="py-4 px-4">Fecha de Detección</th>
+                  <th className="py-4 px-4">Estado</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {warningsData.map((warning) => (
+                  <tr
+                    key={warning.id}
+                    onClick={() => handleWarningClick(warning.id)}
+                    className="border-b border-gray-700 hover:bg-gray-700/50 transition-colors cursor-pointer"
+                  >
+                    <td className="py-4 px-4 font-medium text-white">
+                      {warning.asset}
+                    </td>
+                    <td className="py-4 px-4">{warning.category}</td>
+                    <td className="py-4 px-4">{warning.date}</td>
+                    <td className="py-4 px-4">
+                      <StatusBadge status={warning.status} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
+
+      {/* Warning Detail Modal */}
+      {selectedWarning && (
+        <WarningDetailModal
+          warning={selectedWarning}
+          onClose={handleCloseModal}
+          onUpdate={handleWarningUpdate}
+          onWarningUpdated={setSelectedWarning}
+        />
+      )}
     </main>
   );
 };

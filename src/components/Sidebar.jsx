@@ -5,8 +5,13 @@ import {
   Package,
   Key,
   AlertTriangle,
+  HardDrive,
+  BarChart3,
+  ClipboardCheck,
   Users,
   Building2,
+  UserCog,
+  FileText,
 } from 'lucide-react';
 
 const Sidebar = () => {
@@ -37,14 +42,39 @@ const Sidebar = () => {
       icon: AlertTriangle,
     },
     {
+      path: '/hardware-obsolescence',
+      label: 'Hardware Obsoleto',
+      icon: HardDrive,
+    },
+    {
+      path: '/reports',
+      label: 'Reportes',
+      icon: BarChart3,
+    },
+    {
+      path: '/checkins',
+      label: 'Check-ins',
+      icon: ClipboardCheck,
+    },
+    {
       path: '/users',
-      label: 'Usuarios',
+      label: 'Empleados',
       icon: Users,
+    },
+    {
+      path: '/staff',
+      label: 'Personal IT',
+      icon: UserCog,
     },
     {
       path: '/departments',
       label: 'Departamentos',
       icon: Building2,
+    },
+    {
+      path: '/audit-logs',
+      label: 'Auditoría',
+      icon: FileText,
     },
   ];
 

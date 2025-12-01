@@ -1405,8 +1405,8 @@ const Assets = () => {
     const fetchDepartmentsAndEmployees = async () => {
       try {
         const [deptResponse, empResponse] = await Promise.all([
-          axiosInstance.get('/departments/?limit=100'),
-          axiosInstance.get('/employees/?limit=500')
+          axiosInstance.get('/departments/?page_size=100'),
+          axiosInstance.get('/employees/?page_size=1000')
         ]);
 
         // Handle both paginated and non-paginated responses

@@ -893,9 +893,9 @@ const Reports = () => {
 
                 {/* License Usage */}
                 <div className="bg-gray-800 p-6 rounded-lg lg:col-span-2">
-                  <h3 className="text-lg font-semibold text-white mb-4">Uso de Licencias (Top 10)</h3>
+                  <h3 className="text-lg font-semibold text-white mb-4">Uso de Licencias (Top 3)</h3>
                   <ResponsiveContainer width="100%" height={400}>
-                    <BarChart data={analyticsData.software.license_usage} layout="vertical">
+                    <BarChart data={analyticsData.software.license_usage.slice(0, 3)} layout="vertical">
                       <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                       <XAxis type="number" stroke="#9ca3af" />
                       <YAxis

@@ -94,13 +94,13 @@ const SearchBar = ({ searchTerm, onSearchChange }) => {
   }, [localSearch, onSearchChange]);
 
   return (
-    <div className="relative flex-1">
+    <div className="relative flex-1 w-full md:w-auto">
       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
       <input
         type="text"
         value={localSearch}
         onChange={(e) => setLocalSearch(e.target.value)}
-        placeholder="Buscar por código, serial, marca, modelo, departamento..."
+        placeholder="Buscar por código, serial, marca..."
         className="w-full pl-10 pr-4 py-2 bg-gray-700 text-white border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
       />
     </div>
@@ -110,11 +110,11 @@ const SearchBar = ({ searchTerm, onSearchChange }) => {
 // Filter Dropdown Component
 const FilterDropdown = ({ label, value, options, onChange }) => {
   return (
-    <div className="relative">
+    <div className="relative w-full">
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="appearance-none bg-gray-700 text-white border border-gray-600 rounded-lg px-4 py-2 pr-10 focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer"
+        className="appearance-none w-full bg-gray-700 text-white border border-gray-600 rounded-lg px-4 py-2 pr-10 focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer"
       >
         <option value="">{label}</option>
         {options.map((option) => (
@@ -136,7 +136,7 @@ const Pagination = ({ currentPage, totalPages, totalCount, pageSize, onPageChang
   // Generate page numbers to show
   const getPageNumbers = () => {
     const pages = [];
-    const maxPagesToShow = 5;
+    const maxPagesToShow = 3; // Reduced for mobile
     let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
     let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
 
@@ -153,8 +153,8 @@ const Pagination = ({ currentPage, totalPages, totalCount, pageSize, onPageChang
   if (totalPages <= 1) return null;
 
   return (
-    <div className="flex items-center justify-between py-4 px-6 bg-gray-800 border-t border-gray-700">
-      <div className="text-sm text-gray-400">
+    <div className="flex flex-col md:flex-row items-center justify-between py-4 px-6 bg-gray-800 border-t border-gray-700 gap-4">
+      <div className="text-sm text-gray-400 text-center md:text-left">
         Mostrando {startItem} - {endItem} de {totalCount} activos
       </div>
       <div className="flex items-center gap-2">
@@ -183,7 +183,7 @@ const Pagination = ({ currentPage, totalPages, totalCount, pageSize, onPageChang
           <button
             key={page}
             onClick={() => onPageChange(page)}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+            className={`px-3 md:px-4 py-2 rounded-lg font-medium transition-colors text-sm md:text-base ${
               page === currentPage
                 ? 'bg-blue-500 text-white'
                 : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
@@ -217,7 +217,51 @@ const Pagination = ({ currentPage, totalPages, totalCount, pageSize, onPageChang
   );
 };
 
-// Asset Detail Modal
+// Mobile Asset Card Component
+const MobileAssetCard = ({ asset, onClick }) => {
+  return (
+    <div 
+      onClick={onClick}
+      className="bg-gray-800 p-4 rounded-lg shadow mb-4 border border-gray-700 active:bg-gray-700 transition-colors"
+    >
+      <div className="flex justify-between items-start mb-3">
+        <div className="flex items-center gap-2">
+          <div className="p-2 bg-gray-700 rounded-lg">
+            {(() => {
+              const Icon = ASSET_TYPE_ICONS[asset.asset_type] || Monitor;
+              return <Icon className="w-5 h-5 text-blue-400" />;
+            })()}
+          </div>
+          <div>
+            <span className="text-blue-400 font-bold block">{asset.inventory_code}</span>
+            <span className="text-gray-400 text-xs">{asset.asset_type}</span>
+          </div>
+        </div>
+        <StatusBadge status={asset.status} />
+      </div>
+      
+      <div className="space-y-2 text-sm">
+        <div className="flex justify-between">
+          <span className="text-gray-500">Modelo:</span>
+          <span className="text-gray-300 font-medium text-right">{asset.brand} {asset.model}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-gray-500">Serial:</span>
+          <span className="text-gray-400 font-mono text-xs text-right">{asset.serial_number}</span>
+        </div>
+        <div className="pt-2 border-t border-gray-700 mt-2">
+          <div className="flex justify-between items-center">
+            <span className="text-gray-500">Usuario:</span>
+            <span className={`font-medium text-right ${asset.employee ? 'text-white' : 'text-gray-500 italic'}`}>
+              {asset.employee ? asset.employee.full_name : 'No asignado'}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // Create Asset Modal
 const CreateAssetModal = ({ onClose, onSuccess, departments, employees }) => {
   const [formData, setFormData] = useState({
@@ -303,11 +347,11 @@ const CreateAssetModal = ({ onClose, onSuccess, departments, employees }) => {
 
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-gray-800 rounded-lg shadow-xl w-[95%] max-w-2xl max-h-[90vh] overflow-y-auto">
         <form onSubmit={handleSubmit}>
           {/* Modal Header */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-700">
-            <h2 className="text-2xl font-bold text-white">Añadir Nuevo Activo</h2>
+          <div className="flex items-center justify-between p-4 md:p-6 border-b border-gray-700">
+            <h2 className="text-xl md:text-2xl font-bold text-white">Añadir Nuevo Activo</h2>
             <button
               type="button"
               onClick={onClose}
@@ -318,14 +362,14 @@ const CreateAssetModal = ({ onClose, onSuccess, departments, employees }) => {
           </div>
 
           {/* Modal Content */}
-          <div className="p-6 space-y-4">
+          <div className="p-4 md:p-6 space-y-4">
             {error && (
               <div className="bg-red-900/20 border border-red-500 rounded-lg p-3 text-red-400 text-sm">
                 {error}
               </div>
             )}
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
                   Código de Inventario *
@@ -514,7 +558,7 @@ const CreateAssetModal = ({ onClose, onSuccess, departments, employees }) => {
           </div>
 
           {/* Modal Footer */}
-          <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-700">
+          <div className="flex items-center justify-end gap-3 p-4 md:p-6 border-t border-gray-700">
             <button
               type="button"
               onClick={onClose}
@@ -615,12 +659,12 @@ const HardwareInfo = ({ asset }) => {
             <Cpu className="w-5 h-5 text-blue-400" />
             Especificaciones del Equipo
           </h4>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* CPU */}
             {computerDetail.cpu_model && (
               <div>
                 <label className="text-sm text-gray-400 block mb-1">Procesador</label>
-                <p className="text-white font-medium">{computerDetail.cpu_model}</p>
+                <p className="text-white font-medium break-words">{computerDetail.cpu_model}</p>
               </div>
             )}
 
@@ -659,15 +703,15 @@ const HardwareInfo = ({ asset }) => {
 
             {/* UUID */}
             {computerDetail.unique_identifier && (
-              <div className="col-span-2">
+              <div className="md:col-span-2">
                 <label className="text-sm text-gray-400 block mb-1">UUID BIOS/UEFI</label>
-                <p className="text-gray-300 font-mono text-sm">{computerDetail.unique_identifier}</p>
+                <p className="text-gray-300 font-mono text-sm break-all">{computerDetail.unique_identifier}</p>
               </div>
             )}
 
             {/* Last Updated */}
             {computerDetail.last_updated_by_agent && (
-              <div className="col-span-2">
+              <div className="md:col-span-2">
                 <label className="text-sm text-gray-400 block mb-1">Última Actualización por Agente</label>
                 <p className="text-gray-300 text-sm">
                   {new Date(computerDetail.last_updated_by_agent).toLocaleString('es-CL')}
@@ -688,29 +732,31 @@ const HardwareInfo = ({ asset }) => {
           <div className="space-y-3">
             {storageDevices.map((disk, index) => (
               <div key={disk.id || index} className="bg-gray-800/50 rounded p-3">
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div>
                     <label className="text-xs text-gray-400 block mb-1">Modelo</label>
-                    <p className="text-white font-medium text-sm">{disk.model || 'N/A'}</p>
+                    <p className="text-white font-medium text-sm break-words">{disk.model || 'N/A'}</p>
                   </div>
                   <div>
                     <label className="text-xs text-gray-400 block mb-1">Número de Serie</label>
-                    <p className="text-gray-300 font-mono text-sm">{disk.serial_number || 'N/A'}</p>
+                    <p className="text-gray-300 font-mono text-sm break-words">{disk.serial_number || 'N/A'}</p>
                   </div>
-                  <div>
-                    <label className="text-xs text-gray-400 block mb-1">Capacidad</label>
-                    <p className="text-white font-medium text-sm">
-                      {disk.capacity_gb ? `${disk.capacity_gb.toFixed(2)} GB` : 'N/A'}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="text-xs text-gray-400 block mb-1">Espacio Libre</label>
-                    <p className="text-white font-medium text-sm">
-                      {disk.free_space_gb ? `${disk.free_space_gb.toFixed(2)} GB` : 'N/A'}
-                    </p>
+                  <div className="grid grid-cols-2 gap-3 md:contents">
+                    <div>
+                        <label className="text-xs text-gray-400 block mb-1">Capacidad</label>
+                        <p className="text-white font-medium text-sm">
+                        {disk.capacity_gb ? `${disk.capacity_gb.toFixed(2)} GB` : 'N/A'}
+                        </p>
+                    </div>
+                    <div>
+                        <label className="text-xs text-gray-400 block mb-1">Espacio Libre</label>
+                        <p className="text-white font-medium text-sm">
+                        {disk.free_space_gb ? `${disk.free_space_gb.toFixed(2)} GB` : 'N/A'}
+                        </p>
+                    </div>
                   </div>
                   {disk.capacity_gb && disk.free_space_gb && (
-                    <div className="col-span-2">
+                    <div className="md:col-span-2">
                       <label className="text-xs text-gray-400 block mb-1">Uso</label>
                       <div className="w-full bg-gray-700 rounded-full h-2">
                         <div
@@ -808,8 +854,8 @@ const SoftwareInfo = ({ asset }) => {
                 className="bg-gray-800/50 rounded-lg p-3 flex items-center justify-between"
               >
                 <div className="flex-1">
-                  <h5 className="text-white font-medium">{sw.software_name}</h5>
-                  <div className="flex items-center gap-4 mt-1">
+                  <h5 className="text-white font-medium break-words">{sw.software_name}</h5>
+                  <div className="flex flex-wrap items-center gap-4 mt-1">
                     {sw.software_developer && (
                       <p className="text-gray-400 text-sm">{sw.software_developer}</p>
                     )}
@@ -957,11 +1003,11 @@ const AssetDetailModal = ({ asset, onClose, onUpdate, onAssetUpdated, isAdmin, d
 
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-800 rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-gray-800 rounded-lg shadow-xl w-[95%] max-w-4xl max-h-[90vh] overflow-y-auto">
         {/* Modal Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-700">
+        <div className="flex items-center justify-between p-4 md:p-6 border-b border-gray-700">
           <div>
-            <h2 className="text-2xl font-bold text-white">
+            <h2 className="text-xl md:text-2xl font-bold text-white">
               Detalle de Activo
             </h2>
             <p className="text-sm text-gray-400 mt-1 font-mono">{asset.inventory_code}</p>
@@ -975,7 +1021,7 @@ const AssetDetailModal = ({ asset, onClose, onUpdate, onAssetUpdated, isAdmin, d
         </div>
 
         {/* Modal Content */}
-        <div className="p-6 space-y-6">
+        <div className="p-4 md:p-6 space-y-6">
           {error && (
             <div className="bg-red-900/20 border border-red-500 rounded-lg p-3 text-red-400 text-sm">
               {error}
@@ -1027,7 +1073,7 @@ const AssetDetailModal = ({ asset, onClose, onUpdate, onAssetUpdated, isAdmin, d
           {/* Información General */}
           <div>
             <h3 className="text-lg font-semibold text-white mb-4">Información General</h3>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm text-gray-400 block mb-2">Código de Inventario</label>
                 {isEditing ? (
@@ -1051,7 +1097,7 @@ const AssetDetailModal = ({ asset, onClose, onUpdate, onAssetUpdated, isAdmin, d
                     className="w-full px-3 py-2 bg-gray-700 text-white border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
                 ) : (
-                  <p className="text-white font-medium">{asset.serial_number}</p>
+                  <p className="text-white font-medium break-words">{asset.serial_number}</p>
                 )}
               </div>
               <div>
@@ -1267,7 +1313,7 @@ const AssetDetailModal = ({ asset, onClose, onUpdate, onAssetUpdated, isAdmin, d
         </div>
 
         {/* Modal Footer */}
-        <div className="flex items-center justify-between p-6 border-t border-gray-700">
+        <div className="flex items-center justify-between p-4 md:p-6 border-t border-gray-700">
           <div>
             {isAdmin && !isEditing && !showDeleteConfirm && (
               <button
@@ -1509,7 +1555,7 @@ const Assets = () => {
   // Loading state
   if (loading && assets.length === 0) {
     return (
-      <main className="flex-1 overflow-y-auto p-8 bg-gray-900">
+      <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-gray-900">
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
             <Loader2 className="w-12 h-12 text-blue-500 animate-spin mx-auto mb-4" />
@@ -1523,7 +1569,7 @@ const Assets = () => {
   // Error state
   if (error) {
     return (
-      <main className="flex-1 overflow-y-auto p-8 bg-gray-900">
+      <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-gray-900">
         <div className="bg-red-900/20 border border-red-500 rounded-lg p-6 text-center max-w-md mx-auto mt-8">
           <h3 className="text-xl font-semibold text-white mb-2">Error</h3>
           <p className="text-gray-300">{error}</p>
@@ -1539,13 +1585,13 @@ const Assets = () => {
   }
 
   return (
-    <main className="flex-1 overflow-y-auto bg-gray-900 p-8">
+    <main className="flex-1 overflow-y-auto bg-gray-900 p-4 md:p-8">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold text-white">Gestión de Activos</h1>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        <h1 className="text-2xl md:text-3xl font-bold text-white">Gestión de Activos</h1>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2"
+          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center gap-2 w-full md:w-auto"
         >
           <Plus className="w-5 h-5" />
           Añadir Activo
@@ -1554,144 +1600,165 @@ const Assets = () => {
 
       {/* Search and Filters */}
       <div className="mb-6 space-y-4">
-        <div className="flex gap-4 items-center flex-wrap">
+        <div className="flex flex-col md:flex-row gap-4">
           <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} />
-
-          <FilterDropdown
-            label="Tipo"
-            value={filterType}
-            onChange={setFilterType}
-            options={[
-              { value: 'NOTEBOOK', label: 'Notebook' },
-              { value: 'DESKTOP', label: 'Desktop' },
-              { value: 'MONITOR', label: 'Monitor' },
-              { value: 'PRINTER', label: 'Impresora' },
-              { value: 'OTHER', label: 'Otro' },
-            ]}
-          />
-
-          <FilterDropdown
-            label="Estado"
-            value={filterStatus}
-            onChange={setFilterStatus}
-            options={[
-              { value: 'EN_BODEGA', label: 'En Bodega' },
-              { value: 'ASIGNADO', label: 'Asignado' },
-              { value: 'EN_REPARACION', label: 'En Reparación' },
-              { value: 'DE_BAJA', label: 'De Baja' },
-            ]}
-          />
-
-          <FilterDropdown
-            label="Departamento"
-            value={filterDepartment}
-            onChange={setFilterDepartment}
-            options={departments.map((dept) => ({
-              value: dept.id.toString(),
-              label: dept.name,
-            }))}
-          />
+          
+          <div className="grid grid-cols-2 md:flex gap-4">
+            <div className="col-span-1">
+              <FilterDropdown
+                label="Tipo"
+                value={filterType}
+                onChange={setFilterType}
+                options={[
+                  { value: 'NOTEBOOK', label: 'Notebook' },
+                  { value: 'DESKTOP', label: 'Desktop' },
+                  { value: 'MONITOR', label: 'Monitor' },
+                  { value: 'PRINTER', label: 'Impresora' },
+                  { value: 'OTHER', label: 'Otro' },
+                ]}
+              />
+            </div>
+            <div className="col-span-1">
+              <FilterDropdown
+                label="Estado"
+                value={filterStatus}
+                onChange={setFilterStatus}
+                options={[
+                  { value: 'EN_BODEGA', label: 'Bodega' },
+                  { value: 'ASIGNADO', label: 'Asignado' },
+                  { value: 'EN_REPARACION', label: 'Reparación' },
+                  { value: 'DE_BAJA', label: 'De Baja' },
+                ]}
+              />
+            </div>
+            <div className="col-span-2 md:col-span-auto">
+              <FilterDropdown
+                label="Departamento"
+                value={filterDepartment}
+                onChange={setFilterDepartment}
+                options={departments.map((dept) => ({
+                  value: dept.id.toString(),
+                  label: dept.name,
+                }))}
+              />
+            </div>
+          </div>
 
           {hasActiveFilters && (
             <button
               onClick={clearFilters}
-              className="px-4 py-2 bg-red-500/20 text-red-400 border border-red-500 rounded-lg hover:bg-red-500/30 transition-colors"
+              className="px-4 py-2 bg-red-500/20 text-red-400 border border-red-500 rounded-lg hover:bg-red-500/30 transition-colors w-full md:w-auto"
             >
-              Limpiar Filtros
+              Limpiar
             </button>
           )}
         </div>
       </div>
 
-      {/* Assets Table */}
-      <div className="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
-        {assets.length === 0 ? (
-          // Empty state
-          <div className="flex flex-col items-center justify-center p-12">
-            <Monitor className="w-16 h-16 text-gray-600 mb-4" />
-            <h3 className="text-xl font-semibold text-white mb-2">No se encontraron activos</h3>
-            <p className="text-gray-400 text-center">
-              {searchTerm || hasActiveFilters
-                ? 'No hay activos que coincidan con los filtros aplicados'
-                : 'No hay activos registrados en el sistema'}
-            </p>
+      {/* Assets Content */}
+      {assets.length === 0 ? (
+        <div className="bg-gray-800 rounded-lg shadow-lg p-12 text-center">
+          <Monitor className="w-16 h-16 text-gray-600 mb-4 mx-auto" />
+          <h3 className="text-xl font-semibold text-white mb-2">No se encontraron activos</h3>
+          <p className="text-gray-400">
+            {searchTerm || hasActiveFilters
+              ? 'No hay activos que coincidan con los filtros aplicados'
+              : 'No hay activos registrados en el sistema'}
+          </p>
+        </div>
+      ) : (
+        <div className="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+          {/* Mobile View: Cards */}
+          <div className="md:hidden p-4">
+            {assets.map((asset) => (
+              <MobileAssetCard 
+                key={asset.inventory_code} 
+                asset={asset} 
+                onClick={async () => {
+                  try {
+                    const response = await axiosInstance.get(`/assets/${asset.inventory_code}/`);
+                    setSelectedAsset(response.data);
+                  } catch (err) {
+                    console.error('Error fetching asset details:', err);
+                  }
+                }}
+              />
+            ))}
           </div>
-        ) : (
-          <>
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-max text-left text-gray-300">
-                <thead className="border-b border-gray-700 bg-gray-750">
-                  <tr className="text-gray-400 uppercase text-sm">
-                    <th className="py-4 px-6">Código</th>
-                    <th className="py-4 px-6">Serial</th>
-                    <th className="py-4 px-6">Tipo</th>
-                    <th className="py-4 px-6">Marca</th>
-                    <th className="py-4 px-6">Modelo</th>
-                    <th className="py-4 px-6">Estado</th>
-                    <th className="py-4 px-6">Departamento</th>
-                    <th className="py-4 px-6">Empleado</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {assets.map((asset) => (
-                    <tr
-                      key={asset.inventory_code}
-                      onClick={async () => {
-                        // Fetch full details before opening modal
-                        try {
-                          const response = await axiosInstance.get(`/assets/${asset.inventory_code}/`);
-                          setSelectedAsset(response.data);
-                        } catch (err) {
-                          console.error('Error fetching asset details:', err);
-                        }
-                      }}
-                      className="border-b border-gray-700 hover:bg-gray-700/50 transition-colors cursor-pointer"
-                    >
-                      <td className="py-4 px-6 font-medium text-blue-400">
-                        {asset.inventory_code}
-                      </td>
-                      <td className="py-4 px-6 text-gray-300 font-mono text-sm">
-                        {asset.serial_number}
-                      </td>
-                      <td className="py-4 px-6">
-                        <TypeBadge type={asset.asset_type} />
-                      </td>
-                      <td className="py-4 px-6 text-white font-medium">{asset.brand}</td>
-                      <td className="py-4 px-6 text-gray-300">{asset.model}</td>
-                      <td className="py-4 px-6">
-                        <StatusBadge status={asset.status} />
-                      </td>
-                      <td className="py-4 px-6">
-                        {asset.department ? (
-                          asset.department.name
-                        ) : (
-                          <span className="text-gray-500 italic">Sin departamento</span>
-                        )}
-                      </td>
-                      <td className="py-4 px-6">
-                        {asset.employee ? (
-                          asset.employee.full_name
-                        ) : (
-                          <span className="text-gray-500 italic">No asignado</span>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
 
-            {/* Pagination */}
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              totalCount={pagination.count}
-              pageSize={pageSize}
-              onPageChange={setCurrentPage}
-            />
-          </>
-        )}
-      </div>
+          {/* Desktop View: Table */}
+          <div className="hidden md:block overflow-x-auto">
+            <table className="w-full min-w-max text-left text-gray-300">
+              <thead className="border-b border-gray-700 bg-gray-750">
+                <tr className="text-gray-400 uppercase text-sm">
+                  <th className="py-4 px-6">Código</th>
+                  <th className="py-4 px-6">Serial</th>
+                  <th className="py-4 px-6">Tipo</th>
+                  <th className="py-4 px-6">Marca</th>
+                  <th className="py-4 px-6">Modelo</th>
+                  <th className="py-4 px-6">Estado</th>
+                  <th className="py-4 px-6">Departamento</th>
+                  <th className="py-4 px-6">Empleado</th>
+                </tr>
+              </thead>
+              <tbody>
+                {assets.map((asset) => (
+                  <tr
+                    key={asset.inventory_code}
+                    onClick={async () => {
+                      try {
+                        const response = await axiosInstance.get(`/assets/${asset.inventory_code}/`);
+                        setSelectedAsset(response.data);
+                      } catch (err) {
+                        console.error('Error fetching asset details:', err);
+                      }
+                    }}
+                    className="border-b border-gray-700 hover:bg-gray-700/50 transition-colors cursor-pointer"
+                  >
+                    <td className="py-4 px-6 font-medium text-blue-400">
+                      {asset.inventory_code}
+                    </td>
+                    <td className="py-4 px-6 text-gray-300 font-mono text-sm">
+                      {asset.serial_number}
+                    </td>
+                    <td className="py-4 px-6">
+                      <TypeBadge type={asset.asset_type} />
+                    </td>
+                    <td className="py-4 px-6 text-white font-medium">{asset.brand}</td>
+                    <td className="py-4 px-6 text-gray-300">{asset.model}</td>
+                    <td className="py-4 px-6">
+                      <StatusBadge status={asset.status} />
+                    </td>
+                    <td className="py-4 px-6">
+                      {asset.department ? (
+                        asset.department.name
+                      ) : (
+                        <span className="text-gray-500 italic">Sin departamento</span>
+                      )}
+                    </td>
+                    <td className="py-4 px-6">
+                      {asset.employee ? (
+                        asset.employee.full_name
+                      ) : (
+                        <span className="text-gray-500 italic">No asignado</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Pagination */}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalCount={pagination.count}
+            pageSize={pageSize}
+            onPageChange={setCurrentPage}
+          />
+        </div>
+      )}
 
       {/* Loading overlay for subsequent loads */}
       {loading && assets.length > 0 && (

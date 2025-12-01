@@ -205,7 +205,7 @@ const Dashboard = () => {
   // Error state
   if (error) {
     return (
-      <main className="flex-1 overflow-y-auto p-8 bg-gray-900">
+      <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-gray-900">
         <div className="bg-red-900/20 border border-red-500 rounded-lg p-6 text-center">
           <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-white mb-2">Error</h3>
@@ -216,9 +216,9 @@ const Dashboard = () => {
   }
 
   return (
-    <main className="flex-1 overflow-y-auto p-8 bg-gray-900">
+    <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-gray-900">
       {/* KPI Cards Row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
         {loading ? (
           // Loading skeleton
           <>
@@ -248,12 +248,12 @@ const Dashboard = () => {
       </div>
 
       {/* Active Warnings Section */}
-      <div className="bg-gray-800 rounded-lg shadow-lg p-6">
+      <div className="bg-gray-800 rounded-lg shadow-lg p-4 md:p-6">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-semibold text-white">
+          <h3 className="text-lg md:text-xl font-semibold text-white">
             Advertencias Activas
           </h3>
-          <span className="px-3 py-1 bg-orange-500/20 text-orange-400 rounded-full text-sm font-medium">
+          <span className="px-3 py-1 bg-orange-500/20 text-orange-400 rounded-full text-xs md:text-sm font-medium">
             Sin atender
           </span>
         </div>
@@ -266,8 +266,8 @@ const Dashboard = () => {
             <p className="text-gray-500 text-sm mt-2">¡Todo está en orden!</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-max text-left text-gray-300">
+          <div className="overflow-x-auto -mx-4 md:mx-0 px-4 md:px-0">
+            <table className="w-full min-w-[600px] text-left text-gray-300">
               <thead className="border-b border-gray-700">
                 <tr className="text-gray-400 uppercase text-sm">
                   <th className="py-4 px-4">Activo</th>

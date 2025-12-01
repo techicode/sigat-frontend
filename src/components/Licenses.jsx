@@ -366,17 +366,12 @@ const LicenseDetailModal = ({ license, onClose, onUpdate, onLicenseUpdated, onDe
                   </label>
                   <div className="relative">
                     <input
-                      type="text"
-                      name="license-key-field"
-                      value={showFullKey ? formData.license_key : formData.license_key.replace(/./g, '•')}
-                      onChange={(e) => {
-                        if (showFullKey) {
-                          setFormData({ ...formData, license_key: e.target.value });
-                        }
-                      }}
+                      type={showFullKey ? "text" : "password"}
+                      name="license_key_edit"
+                      value={formData.license_key}
+                      onChange={(e) => setFormData({ ...formData, license_key: e.target.value })}
                       placeholder="Sin clave"
-                      readOnly={!showFullKey}
-                      autoComplete="off"
+                      autoComplete="new-password"
                       data-form-type="other"
                       className="w-full px-3 py-2 pr-10 bg-gray-700 text-white border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 font-mono"
                     />
@@ -769,17 +764,12 @@ const LicenseFormModal = ({ onClose, onSave, softwareList }) => {
             </label>
             <div className="relative">
               <input
-                type="text"
-                name="license-key-field"
-                value={showFullKey ? formData.license_key : formData.license_key.replace(/./g, '•')}
-                onChange={(e) => {
-                  if (showFullKey) {
-                    setFormData({ ...formData, license_key: e.target.value });
-                  }
-                }}
+                type={showFullKey ? "text" : "password"}
+                name="license_key_create"
+                value={formData.license_key}
+                onChange={(e) => setFormData({ ...formData, license_key: e.target.value })}
                 placeholder="XXXX-XXXX-XXXX-XXXX"
-                readOnly={!showFullKey}
-                autoComplete="off"
+                autoComplete="new-password"
                 data-form-type="other"
                 className="w-full px-3 py-2 pr-10 bg-gray-700 text-white border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 font-mono"
               />
